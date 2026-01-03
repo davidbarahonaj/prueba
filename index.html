@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mano Robótica EMG</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f4f6f8;
+  margin:0;
+  padding:30px;
+}
+
+/* ===== ENCABEZADO ===== */
+.header{
+  background:#ffffff;
+  padding:20px 30px;
+  border-radius:15px;
+  box-shadow:0 4px 10px rgba(0,0,0,.1);
+}
+
+.header-top{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  color:#555;
+}
+
+.wifi{
+  background:#fdecea;
+  color:#c0392b;
+  padding:10px 15px;
+  border-radius:25px;
+  font-weight:bold;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:10px;
+}
+
+.dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:red;
+}
+
+/* ===== TITULOS ===== */
+h1{
+  margin-top:20px;
+  color:#0b3558;
+}
+
+h2{
+  color:#f39c12;
+  font-size:42px;
+  margin:5px 0 25px;
+}
+
+/* ===== TARJETA ===== */
+.card{
+  background:white;
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 4px 10px rgba(0,0,0,.1);
+  max-width:700px;
+}
+
+.estado{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:22px;
+  margin-top:20px;
+}
+
+.indicador{
+  width:24px;
+  height:24px;
+  border-radius:50%;
+}
+
+.verde{ background:#2ecc71; }
+.rojo{ background:#e74c3c; }
+
+/* ===== LISTA ===== */
+.lista{
+  display:flex;
+  justify-content:space-between;
+  margin-top:20px;
+}
+.lista ul{
+  list-style:disc;
+  padding-left:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <span>3/1/2026</span>
+    <span id="hora">--:--</span>
+  </div>
+
+  <div class="wifi" id="wifiBox">
+    <div class="dot" id="wifiDot"></div>
+    <span id="wifiTxt">WiFi: SIN RESPUESTA</span>
+  </div>
+
+  <h1>TECNOLÓGICO UNIVERSITARIO VIDA NUEVA</h1>
+  <h2>MANO ROBÓTICA</h2>
+
+  <div class="card">
+    <div class="lista">
+      <ul>
+        <li>ALCACIEGA ALEX</li>
+        <li>CHUQUI ADONIS</li>
+        <li>NAVARRETE ALEXIS</li>
+      </ul>
+      <ul>
+        <li>BARAHONA DAVID</li>
+        <li>GUANOTASIG JOEL</li>
+        <li>TOAQUIZA ERICK</li>
+      </ul>
+    </div>
+
+    <div class="estado">
+      <span>Estado de la mano:</span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="txtEstado">---</span>
+        <div id="led" class="indicador rojo"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ESP32_IP = "http://192.168.101.60";
+
+function actualizarHora(){
+  const ahora = new Date();
+  hora.innerText = ahora.toLocaleTimeString();
+}
+setInterval(actualizarHora,1000);
+actualizarHora();
+
+setInterval(()=>{
+  fetch(`${ESP32_IP}/estado`)
+    .then(r=>r.json())
+    .then(d=>{
+      wifiTxt.innerText="WiFi: CONECTADO";
+      wifiDot.style.background="green";
+
+      if(d.estado==50){
+        txtEstado.innerText="CERRADA";
+        led.className="indicador verde";
+      }else{
+        txtEstado.innerText="ABIERTA";
+        led.className="indicador rojo";
+      }
+    })
+    .catch(()=>{
+      wifiTxt.innerText="WiFi: SIN RESPUESTA";
+      wifiDot.style.background="red";
+      txtEstado.innerText="---";
+      led.className="indicador rojo";
+    });
+},500);
+</script>
+
+</body>
+</html>
